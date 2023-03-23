@@ -4,7 +4,6 @@ enum ScanState {
   noScanOperation,
 }
 
-
 Map<dynamic, String> billStatesTranslations = {
   BillState.canceled: 'ملغية',
   BillState.onWait: 'في الانتظار',
@@ -70,7 +69,6 @@ enum CreditType {
   purchasesInvoice,
 }
 
-
 CreditType? getCreditType(String state) {
   for (var creditType in CreditType.values) {
     if (creditType.toString() == state) {
@@ -96,6 +94,19 @@ TaskState? getTaskState(String state) {
   }
   return null;
 }
+
+Map<dynamic, String> taskStatesTranslations = {
+  TaskState.done: 'تم',
+  'TaskState.done': 'تم',
+  TaskState.faild: 'فشلت',
+  'TaskState.faild': 'فشلت',
+  TaskState.waiting: 'في الانتظار',
+  'TaskState.waiting': 'في الانتظار',
+  TaskState.canceld: 'تم الاللغاء',
+  'TaskState.canceld': 'تم الاللغاء',
+  TaskState.frozed: 'مجمدة',
+  'TaskState.frozed': 'مجمدة',
+}; 
 
 
 // class TaskMKN {
