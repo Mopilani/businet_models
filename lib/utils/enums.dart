@@ -79,3 +79,22 @@ CreditType? getCreditType(String state) {
   }
   return null;
 }
+
+enum TaskState {
+  done,
+  faild,
+  waiting,
+  canceld,
+  frozed,
+}
+
+// class TaskMKN {
+//   static const String id = 'id';
+//   static const String title = 't';
+//   static const String content = 'c';
+//   static const String from = 'f';
+//   static const String state = 'ts';
+//   static const String createTime = 'ct';
+//   static const String readTime = 'rt';
+//   static const String recieveTime = 'rct';
+// }
