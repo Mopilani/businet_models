@@ -38,7 +38,7 @@ class TaskModel {
       title: data['title'],
       content: data['content'],
       createTime: data['createTime'],
-      taskState: data['taskState'],
+      taskState: getTaskState(data['taskState'])!,
       readTime: data['readTime'],
       recieveTime: data['recieveTime'],
     );
@@ -52,7 +52,7 @@ class TaskModel {
         'title': title,
         'content': content,
         'createTime': createTime,
-        'taskState': taskState,
+        'taskState': taskState.toString(),
         'readTime': readTime,
         'recieveTime': recieveTime,
       };

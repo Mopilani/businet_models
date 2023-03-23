@@ -88,6 +88,16 @@ enum TaskState {
   frozed,
 }
 
+TaskState? getTaskState(String state) {
+  for (var creditType in TaskState.values) {
+    if (creditType.toString() == state) {
+      return creditType;
+    }
+  }
+  return null;
+}
+
+
 // class TaskMKN {
 //   static const String id = 'id';
 //   static const String title = 't';

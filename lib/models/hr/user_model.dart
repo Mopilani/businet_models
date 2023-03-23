@@ -138,6 +138,25 @@ class UserModel {
     return UserModel.fromMap(d);
   }
 
+  static Future<List<UserModel>> getAll() {
+    List<UserModel> catgs = [];
+    return SystemMDBService.db
+        .collection(collectionName)
+        .find()
+        .transform<UserModel>(
+          StreamTransformer.fromHandlers(
+            handleData: (data, sink) {
+              sink.add(UserModel.fromMap(data));
+            },
+          ),
+        )
+        .listen((model) {
+          catgs.add(model);
+        })
+        .asFuture()
+        .then((value) => catgs);
+  }
+
   static Future<UserModel?> findByUsername(String username) async {
     var r = await SystemMDBService.db
         .collection(collectionName)
