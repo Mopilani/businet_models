@@ -10,6 +10,7 @@ class TaskModel {
   TaskModel(
     this.id, {
     required this.from,
+    required this.to,
     required this.title,
     required this.content,
     required this.createTime,
@@ -20,6 +21,7 @@ class TaskModel {
   dynamic id;
   late String title;
   late String from;
+  late String to;
   late String content;
   late TaskState taskState;
   late DateTime createTime;
@@ -32,6 +34,7 @@ class TaskModel {
     TaskModel model = TaskModel(
       data['id'],
       from: data['from'],
+      to: data['to'],
       title: data['title'],
       content: data['content'],
       createTime: data['createTime'],
@@ -45,6 +48,7 @@ class TaskModel {
   Map<String, dynamic> toMap() => {
         'id': id,
         'from': from,
+        'to': to,
         'title': title,
         'content': content,
         'createTime': createTime,
@@ -96,7 +100,7 @@ class TaskModel {
     return TaskModel.fromMap(d);
   }
 
-  static Future<TaskModel?> get(int id) async {
+  static Future<TaskModel?> get(dynamic id) async {
     var d = await SystemMDBService.db
         .collection(collectionName)
         .findOne(where.eq('id', id));
@@ -106,7 +110,7 @@ class TaskModel {
     return TaskModel.fromMap(d);
   }
 
-  static Future<TaskModel?> findById(int id) async {
+  static Future<TaskModel?> findById(dynamic id) async {
     var d = await SystemMDBService.db
         .collection(collectionName)
         .findOne(where.eq('id', id));
