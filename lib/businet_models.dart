@@ -44,6 +44,8 @@ export 'models/sales/stock_model.dart';
 export 'models/sales/supplier_model.dart';
 export 'models/sales/side_entry_model.dart';
 
+export 'models/common/task_model.dart';
+
 export 'models/subcatgory_model.dart';
 export 'models/system_config.dart';
 export 'models/system_node_model.dart';
