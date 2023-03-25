@@ -6,7 +6,6 @@ import 'package:mongo_dart/mongo_dart.dart';
 import '../utils/system_db.dart';
 import 'category_model.dart';
 
-
 class SubCatgModel {
   SubCatgModel(
     this.id,
@@ -27,7 +26,7 @@ class SubCatgModel {
     model.id = data['id'];
     model.subcatgoryName = data['subcatgoryName'];
     model.subcatgoryDescription = data['subcatgoryDescription'];
-    model.category = data['category'];
+    model.category = CategoryModel.fromMap(data['category']);
     return model;
   }
 
@@ -35,7 +34,7 @@ class SubCatgModel {
         'id': id,
         'subcatgoryName': subcatgoryName,
         'subcatgoryDescription': subcatgoryDescription,
-        'category': category,
+        'category': category.toMap(),
       };
 
   String toJson() => json.encode(toMap());
@@ -74,7 +73,8 @@ class SubCatgModel {
   }
 
   Future<SubCatgModel?> aggregate(List<dynamic> pipeline) async {
-    var d = await SystemMDBService.db.collection('subcatgs').aggregate(pipeline);
+    var d =
+        await SystemMDBService.db.collection('subcatgs').aggregate(pipeline);
 
     return SubCatgModel.fromMap(d);
   }

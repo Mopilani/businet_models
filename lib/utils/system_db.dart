@@ -22,6 +22,7 @@ class SystemMDBService {
   Db? _db;
 
   Future<Db?> init() async {
+    print('Initializing DB ${mongoDBUriString}');
     if (Platform.isAndroid) {
       _db = HDb(hiveDBPath);
     } else {
@@ -46,6 +47,26 @@ class SystemMDBService {
     GlobalState.set('db2', _db);
     return _db;
   }
+
+  static Future<void> use({
+    hiveDBPath,
+    mongoDBUriString,
+    username = 'businet',
+    password = 'businet',
+    auth = true,
+  }) async {
+    await SystemMDBService.db.close().then((value) async {
+      await SystemMDBService(
+        mongoDBUriString: hiveDBPath,
+        hiveDBPath: mongoDBUriString,
+        password: password,
+        username: username,
+        auth: auth,
+      ).init();
+    });
+  }
+
+  Future<void> resetDb() async {}
 
   static Db get db => () {
         return GlobalState.get('db2');
