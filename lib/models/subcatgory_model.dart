@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../utils/system_db.dart';
+import 'category_model.dart';
 
 
 class SubCatgModel {
@@ -11,6 +12,7 @@ class SubCatgModel {
     this.id,
     this.subcatgoryName,
     this.subcatgoryDescription,
+    this.category,
   );
 
   SubCatgModel._();
@@ -18,12 +20,14 @@ class SubCatgModel {
   dynamic id;
   late String subcatgoryName;
   late String subcatgoryDescription;
+  late CategoryModel category;
 
   static SubCatgModel fromMap(Map<String, dynamic> data) {
     SubCatgModel model = SubCatgModel._();
     model.id = data['id'];
     model.subcatgoryName = data['subcatgoryName'];
     model.subcatgoryDescription = data['subcatgoryDescription'];
+    model.category = data['category'];
     return model;
   }
 
@@ -31,6 +35,7 @@ class SubCatgModel {
         'id': id,
         'subcatgoryName': subcatgoryName,
         'subcatgoryDescription': subcatgoryDescription,
+        'category': category,
       };
 
   String toJson() => json.encode(toMap());
