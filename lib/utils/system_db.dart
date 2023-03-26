@@ -5,6 +5,32 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'global_state.dart';
 import 'hcol.dart';
 
+class SMDB extends SystemMDBService {
+  SMDB({
+    required String hiveDBPath,
+    required String mongoDBUriString,
+    String username = 'businet',
+    String password = 'businet',
+    bool auth = true,
+  }) : super(
+          hiveDBPath: hiveDBPath,
+          mongoDBUriString: mongoDBUriString,
+          username: username,
+          password: password,
+          auth: auth,
+        );
+
+  static Future<void> useMain() async {
+    await SMDB.sysMdbs.first.sysMDB
+        .init()
+        .then((value) => currentDb = SMDB.sysMdbs.first);
+  }
+
+  static DBMeta? currentDb;
+
+  static List<DBMeta> sysMdbs = [];
+}
+
 class SystemMDBService {
   SystemMDBService({
     required this.hiveDBPath,
@@ -13,6 +39,7 @@ class SystemMDBService {
     this.password = 'businet',
     this.auth = true,
   });
+
   final String mongoDBUriString;
   final String hiveDBPath;
   final String username;
@@ -22,7 +49,7 @@ class SystemMDBService {
   Db? _db;
 
   Future<Db?> init() async {
-    print('Initializing DB ${mongoDBUriString}');
+    print('Initializing DB $mongoDBUriString');
     if (Platform.isAndroid) {
       _db = HDb(hiveDBPath);
     } else {
@@ -71,6 +98,17 @@ class SystemMDBService {
   static Db get db => () {
         return GlobalState.get('db2');
       }();
+}
+
+class DBMeta {
+  DBMeta(
+    this.name,
+    this.description,
+    this.sysMDB,
+  );
+  String name;
+  String description;
+  SystemMDBService sysMDB;
 }
 
 class BusinetDBError extends Error {
