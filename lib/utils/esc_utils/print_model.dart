@@ -24,7 +24,8 @@ class PrintServiceModel {
     var file = File('C:/Program Files/Besmar/rph.exe');
     if (await file.exists()) {
       _printModel!.process = await Process.start(
-        'C:/Users/Mopilani/source/repos/raw_print_helper/raw_print_helper/bin/Release/net6.0/raw_print_helper.exe',
+        // 'C:/Users/Mopilani/source/repos/raw_print_helper/raw_print_helper/bin/Release/net6.0/raw_print_helper.exe',
+        'printing/rph/raw_print_helper.exe',
         // 'C:/Program Files/Besmar/rph.exe',
         // 'C:/H/NexaPros_Flutter/cashier_p/windows/raw_printer_helper/raw_print_helper.exe',
         [printerName],
