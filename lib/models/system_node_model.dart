@@ -33,6 +33,7 @@ class SystemNodeModel {
     this.thirdManagerPhone,
     this.thirdManagerRank,
     this.stock,
+    this.watchedTuts,
     this.metadata = const {
       'recordShiftSANDT': true,
       'recordDaySANDT': true,
@@ -51,6 +52,7 @@ class SystemNodeModel {
     },
   }) {
     setNode(this);
+    watchedTuts = [];
   }
 
   late int id;
@@ -79,6 +81,7 @@ class SystemNodeModel {
   String? thirdManagerPhone;
   String? thirdManagerRank;
   StockModel? stock;
+  List<String>? watchedTuts = [];
 
   // Actions Recording Options
   bool? recordShiftSANDT = true;
@@ -114,6 +117,7 @@ class SystemNodeModel {
     model.printerName = data['printerName'];
     model.groupId = data['groupId'];
     model.deviceId = data['deviceId'];
+    model.watchedTuts = data['watchedTuts'];
     model.stock =
         data['stock'] == null ? null : StockModel.fromMap(data['stock']);
     model.firstManagerName = data['firstManagerName'];
@@ -163,6 +167,7 @@ class SystemNodeModel {
         'groupId': groupId,
         'deviceId': deviceId,
         'stock': stock?.toMap(),
+        'watchedTuts': watchedTuts,
         'firstManagerName': firstManagerName,
         'firstManagerPhone': firstManagerPhone,
         'firstManagerRank': firstManagerRank,
