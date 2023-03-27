@@ -26,7 +26,9 @@ class SubCatgModel {
     model.id = data['id'];
     model.subcatgoryName = data['subcatgoryName'];
     model.subcatgoryDescription = data['subcatgoryDescription'];
-    model.category = CategoryModel.fromMap(data['category']);
+    data['category'] == null
+        ? null
+        : model.category = CategoryModel.fromMap(data['category']);
     return model;
   }
 
@@ -34,7 +36,13 @@ class SubCatgModel {
         'id': id,
         'subcatgoryName': subcatgoryName,
         'subcatgoryDescription': subcatgoryDescription,
-        'category': category.toMap(),
+        'category': () {
+          try {
+            return category.toMap();
+          } catch (e) {
+            return null;
+          }
+        }(),
       };
 
   String toJson() => json.encode(toMap());
