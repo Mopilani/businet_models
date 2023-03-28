@@ -11,7 +11,7 @@ class InterfaceType {
   static const String pharmacy = 'pharmacy';
   static const String lab = 'lab';
   static const String mall = 'mall';
-  static const String resturant = 'resturant';
+  static const String restaurant = 'restaurant';
   static const String wholeSales = 'wholeSales';
 }
 
