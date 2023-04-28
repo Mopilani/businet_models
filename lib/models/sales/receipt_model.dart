@@ -39,6 +39,10 @@ class ReceiptModel {
     required this.receiptPaymentMethods,
   });
 
+  static const String collectionName = 'rcpts';
+  static const String backedCollectionName = 'rcpts-backup';
+  static const String suspendedCollectionName = 'rcpts-suspended';
+
   late int id;
   String? note;
   double total;
@@ -161,7 +165,7 @@ class ReceiptModel {
   static Future<List<ReceiptModel>> getAll() async {
     List<ReceiptModel> result = [];
     return SystemMDBService.db
-        .collection('rcpts')
+        .collection(collectionName)
         .find()
         .transform<ReceiptModel>(
           StreamTransformer.fromHandlers(
@@ -178,7 +182,7 @@ class ReceiptModel {
   }
 
   static Stream<ReceiptModel> stream() {
-    return SystemMDBService.db.collection('rcpts').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
           StreamTransformer.fromHandlers(
             handleData: (data, sink) {
               sink.add(ReceiptModel.fromMap(data));
@@ -192,7 +196,7 @@ class ReceiptModel {
 
   // Streams the backed-up receitps
   static Stream<ReceiptModel> streamBacked() {
-    return SystemMDBService.db.collection('rcpts-backup').find().transform(
+    return SystemMDBService.db.collection(backedCollectionName).find().transform(
           StreamTransformer.fromHandlers(
             handleData: (data, sink) {
               sink.add(ReceiptModel.fromMap(data));
@@ -205,19 +209,19 @@ class ReceiptModel {
   }
 
   Future<ReceiptModel?> aggregate(List<dynamic> pipeline) async {
-    var d = await SystemMDBService.db.collection('rcpts').aggregate(pipeline);
+    var d = await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
 
     return ReceiptModel.fromMap(d);
   }
 
   static Future<ReceiptModel?> get(int id, [bool multiFind = true]) async {
     var value = await SystemMDBService.db
-        .collection('rcpts')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (value == null) {
       if (multiFind) {
         value = await SystemMDBService.db
-            .collection('rcpts-backup')
+            .collection(backedCollectionName)
             .findOne(where.eq('id', id));
         if (value == null) {
           return null;
@@ -234,11 +238,11 @@ class ReceiptModel {
   static Future<ReceiptModel?> getSuspendedReceipt(int id,
       [bool multiFind = true]) async {
     var value = await SystemMDBService.db
-        .collection('rcpts-suspended')
+        .collection(suspendedCollectionName)
         .findOne(where.eq('id', id));
     if (value == null) return null;
 
-    await SystemMDBService.db.collection('rcpts-suspended').remove(
+    await SystemMDBService.db.collection(suspendedCollectionName).remove(
           where.eq('id', id),
         );
 
@@ -247,7 +251,7 @@ class ReceiptModel {
 
   Future<ReceiptModel?> findByName(String name) async {
     var d = await SystemMDBService.db
-        .collection('rcpts')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -259,7 +263,7 @@ class ReceiptModel {
     Map<String, ReceiptEntryModel>? oldReceiptEntries,
     receiptModelView,
   ]) async {
-    var r = await SystemMDBService.db.collection('rcpts').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -288,7 +292,7 @@ class ReceiptModel {
   }
 
   // Future<int> delete(String id) async {
-  //   var r = await SystemMDBService.db.collection('rcpts').remove(
+  //   var r = await SystemMDBService.db.collection(collectionName).remove(
   //         where.eq('id', id),
   //       );
   //   // await ActionModel.(id);
@@ -304,7 +308,7 @@ class ReceiptModel {
       print(res?.body);
     }); // Backend SVC
 
-    var r = await SystemMDBService.db.collection('rcpts').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
 
@@ -331,14 +335,14 @@ class ReceiptModel {
   }
 
   static Future<void> _addToBackup(ReceiptModel receiptModel) async {
-    var r = await SystemMDBService.db.collection('rcpts-backup').insert(
+    var r = await SystemMDBService.db.collection(backedCollectionName).insert(
           receiptModel.toMap(),
         );
     print(r);
   }
 
   static Future<void> suspend(ReceiptModel receiptModel) async {
-    var r = await SystemMDBService.db.collection('rcpts-suspended').insert(
+    var r = await SystemMDBService.db.collection(suspendedCollectionName).insert(
           receiptModel.toMap(),
         );
     print(r);
@@ -353,8 +357,8 @@ class ReceiptModel {
             StreamTransformer.fromHandlers(handleDone: (sink) async {
       sink.close();
       if (error == null) {
-        await SystemMDBService.db.collection('rcpts').drop();
-        await SystemMDBService.db.createCollection('rcpts');
+        await SystemMDBService.db.collection(collectionName).drop();
+        await SystemMDBService.db.createCollection(collectionName);
       }
     }, handleError: (e, s, sink) {
       error = e;

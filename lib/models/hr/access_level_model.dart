@@ -32,7 +32,7 @@ class AccessLevelModel {
       levelDescription: data['levelDescription'],
       accessToken: data['accessToken'],
       levelNumber: data['levelNumber'],
-      allowedLevels: data['allowedLevels'] ?? {},
+      allowedLevels: {...data['allowedLevels']} ?? {},
       nodeId: data['nodeId'],
     );
     return model;
@@ -83,8 +83,9 @@ class AccessLevelModel {
   }
 
   Future<AccessLevelModel?> aggregate(List<dynamic> pipeline) async {
-    var d =
-        await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .aggregate(pipeline);
 
     return AccessLevelModel.fromMap(d);
   }

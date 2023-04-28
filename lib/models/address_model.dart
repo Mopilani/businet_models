@@ -6,6 +6,8 @@ import 'package:mongo_dart/mongo_dart.dart';
 import '../utils/system_db.dart';
 
 class AddressModel {
+  static const String collectionName = 'addresses';
+  
   String? town;
   String? area;
   String? state;
@@ -34,7 +36,7 @@ class AddressModel {
   }
 
   Stream<AddressModel>? stream() {
-    return SystemMDBService.db.collection('addresses').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(AddressModel.fromMap(data));
@@ -44,14 +46,14 @@ class AddressModel {
   }
 
   Future<AddressModel?> aggregate(List<dynamic> pipeline) async {
-    var d = await SystemMDBService.db.collection('addresses').aggregate(pipeline);
+    var d = await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
 
     return AddressModel.fromMap(d);
   }
 
   Future<AddressModel?> get(String id) async {
     var d =
-        await SystemMDBService.db.collection('addresses').findOne(where.eq('id', id));
+        await SystemMDBService.db.collection(collectionName).findOne(where.eq('id', id));
     if (d == null) {
       return null;
     }
@@ -60,7 +62,7 @@ class AddressModel {
 
   Future<AddressModel?> findByName(String name, String id) async {
     var d =
-        await SystemMDBService.db.collection('addresses').findOne(where.eq('id', id));
+        await SystemMDBService.db.collection(collectionName).findOne(where.eq('id', id));
     if (d == null) {
       return null;
     }
@@ -68,7 +70,7 @@ class AddressModel {
   }
 
   Future<AddressModel?> edit(String id, Map<String, dynamic> document) async {
-    var r = await SystemMDBService.db.collection('addresses').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           document,
         );
@@ -77,7 +79,7 @@ class AddressModel {
   }
 
   Future<int> delete(String id) async {
-    var r = await SystemMDBService.db.collection('addresses').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     print(r);
@@ -85,7 +87,7 @@ class AddressModel {
   }
 
   Future<int> add(AddressModel product) async {
-    var r = await SystemMDBService.db.collection('addresses').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           product.toMap(),
         );
     print(r);

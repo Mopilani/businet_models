@@ -7,6 +7,9 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 class SideEntryModel {
   SideEntryModel(this.id, this.title, this.number);
+
+  static const String collectionName = 'sentries';
+
   final int id;
   final String title;
   final String number;
@@ -29,7 +32,7 @@ class SideEntryModel {
   static Future<List<SideEntryModel>> getAll() async {
     List<SideEntryModel> result = [];
     return SystemMDBService.db
-        .collection('sentries')
+        .collection(collectionName)
         .find()
         .transform<SideEntryModel>(
           StreamTransformer.fromHandlers(
@@ -46,7 +49,7 @@ class SideEntryModel {
   }
 
   Stream<SideEntryModel>? stream() {
-    return SystemMDBService.db.collection('sentries').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(SideEntryModel.fromMap(data));
@@ -57,14 +60,14 @@ class SideEntryModel {
 
   Future<SideEntryModel?> aggregate(List<dynamic> pipeline) async {
     var d =
-        await SystemMDBService.db.collection('sentries').aggregate(pipeline);
+        await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
 
     return SideEntryModel.fromMap(d);
   }
 
   static Future<SideEntryModel?> get(int id) async {
     var d = await SystemMDBService.db
-        .collection('sentries')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -74,7 +77,7 @@ class SideEntryModel {
 
   static Future<SideEntryModel?> findByTitle(String title) async {
     var d = await SystemMDBService.db
-        .collection('sentries')
+        .collection(collectionName)
         .findOne(where.eq('title', title));
     if (d == null) {
       return null;
@@ -84,7 +87,7 @@ class SideEntryModel {
 
   static Future<SideEntryModel?> findById(int id) async {
     var d = await SystemMDBService.db
-        .collection('sentries')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -93,7 +96,7 @@ class SideEntryModel {
   }
 
   Future<SideEntryModel> edit() async {
-    var r = await SystemMDBService.db.collection('sentries').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -102,7 +105,7 @@ class SideEntryModel {
   }
 
   Future<int> delete() async {
-    var r = await SystemMDBService.db.collection('sentries').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     print(r);
@@ -110,7 +113,7 @@ class SideEntryModel {
   }
 
   Future<int> add() async {
-    var r = await SystemMDBService.db.collection('sentries').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     print(r);

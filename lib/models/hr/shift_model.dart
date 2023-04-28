@@ -26,6 +26,8 @@ class ShiftModel {
     this.id = id ?? '${dateToString(startDateTime)}-$number';
   }
 
+  static const String collectionName = 'shifts'; 
+
   late String id;
   String? title;
   int number;
@@ -79,7 +81,7 @@ class ShiftModel {
   static Future<List<ShiftModel>> getAll() async {
     List<ShiftModel> result = [];
     return SystemMDBService.db
-        .collection('shifts')
+        .collection(collectionName)
         .find()
         .transform<ShiftModel>(
           StreamTransformer.fromHandlers(
@@ -96,7 +98,7 @@ class ShiftModel {
   }
 
   Stream<ShiftModel>? stream() {
-    return SystemMDBService.db.collection('shifts').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(ShiftModel.fromMap(data));
@@ -106,14 +108,14 @@ class ShiftModel {
   }
 
   Future<ShiftModel?> aggregate(List<dynamic> pipeline) async {
-    var d = await SystemMDBService.db.collection('shifts').aggregate(pipeline);
+    var d = await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
 
     return ShiftModel.fromMap(d);
   }
 
   static Future<ShiftModel?> get(String id) async {
     var d = await SystemMDBService.db
-        .collection('shifts')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -123,7 +125,7 @@ class ShiftModel {
 
   static Future<ShiftModel?> findByTitle(String title) async {
     var d = await SystemMDBService.db
-        .collection('shifts')
+        .collection(collectionName)
         .findOne(where.eq('title', title));
     if (d == null) {
       return null;
@@ -133,7 +135,7 @@ class ShiftModel {
 
   static Future<ShiftModel?> findById(String id) async {
     var d = await SystemMDBService.db
-        .collection('shifts')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -142,7 +144,7 @@ class ShiftModel {
   }
 
   Future<ShiftModel> edit() async {
-    var r = await SystemMDBService.db.collection('shifts').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -151,16 +153,16 @@ class ShiftModel {
   }
 
   static Future<int> delete() async {
-    // var r = await SystemMDBService.db.collection('shifts').remove(
+    // var r = await SystemMDBService.db.collection(collectionName).remove(
     //       where.eq('id', id),
     //     );
-    var r = await SystemMDBService.db.collection('shifts').drop();
+    var r = await SystemMDBService.db.collection(collectionName).drop();
     print(r);
     return 1;
   }
 
   Future<int> add() async {
-    var r = await SystemMDBService.db.collection('shifts').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     print(r);

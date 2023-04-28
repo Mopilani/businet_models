@@ -11,8 +11,9 @@ class SubCatgModel {
     this.id,
     this.subcatgoryName,
     this.subcatgoryDescription,
-    this.category,
-  );
+    this.category, {
+    this.imageUrl,
+  });
 
   SubCatgModel._();
 
@@ -20,12 +21,16 @@ class SubCatgModel {
   late String subcatgoryName;
   late String subcatgoryDescription;
   late CategoryModel category;
+  String? imageUrl;
+
+  static const String collectionName = 'subcatgs';
 
   static SubCatgModel fromMap(Map<String, dynamic> data) {
     SubCatgModel model = SubCatgModel._();
     model.id = data['id'];
     model.subcatgoryName = data['subcatgoryName'];
     model.subcatgoryDescription = data['subcatgoryDescription'];
+    model.imageUrl = data['imageUrl'];
     data['category'] == null
         ? null
         : model.category = CategoryModel.fromMap(data['category']);
@@ -36,6 +41,7 @@ class SubCatgModel {
         'id': id,
         'subcatgoryName': subcatgoryName,
         'subcatgoryDescription': subcatgoryDescription,
+        'imageUrl': imageUrl,
         'category': () {
           try {
             return category.toMap();
@@ -54,7 +60,7 @@ class SubCatgModel {
   static Future<List<SubCatgModel>> getAll() {
     List<SubCatgModel> models = [];
     return SystemMDBService.db
-        .collection('subcatgs')
+        .collection(collectionName)
         .find()
         .transform<SubCatgModel>(
           StreamTransformer.fromHandlers(
@@ -71,7 +77,7 @@ class SubCatgModel {
   }
 
   Stream<SubCatgModel>? stream() {
-    return SystemMDBService.db.collection('subcatgs').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(SubCatgModel.fromMap(data));
@@ -82,14 +88,14 @@ class SubCatgModel {
 
   Future<SubCatgModel?> aggregate(List<dynamic> pipeline) async {
     var d =
-        await SystemMDBService.db.collection('subcatgs').aggregate(pipeline);
+        await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
 
     return SubCatgModel.fromMap(d);
   }
 
   static Future<SubCatgModel?> get(int id) async {
     var d = await SystemMDBService.db
-        .collection('subcatgs')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -99,7 +105,7 @@ class SubCatgModel {
 
   static Future<SubCatgModel?> findById(int id) async {
     var d = await SystemMDBService.db
-        .collection('subcatgs')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -108,7 +114,7 @@ class SubCatgModel {
   }
 
   Future<SubCatgModel?> edit() async {
-    var r = await SystemMDBService.db.collection('subcatgs').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -117,7 +123,7 @@ class SubCatgModel {
   }
 
   Future<int> delete() async {
-    var r = await SystemMDBService.db.collection('subcatgs').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     print(r);
@@ -125,7 +131,7 @@ class SubCatgModel {
   }
 
   Future<int> add() async {
-    var r = await SystemMDBService.db.collection('subcatgs').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     print(r);

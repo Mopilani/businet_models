@@ -11,6 +11,9 @@ class SaleUnitModel {
       this.id, this.name, this.quantity, this.containsUnknownQuantity) {
     // id = const Uuid().v4();
   }
+
+  static const String collectionName = 'saleunits';
+
   dynamic id;
   late String name;
   late double quantity;
@@ -42,7 +45,7 @@ class SaleUnitModel {
   static Future<List<SaleUnitModel>> getAll() async {
     List<SaleUnitModel> result = [];
     return SystemMDBService.db
-        .collection('saleunits')
+        .collection(collectionName)
         .find()
         .transform<SaleUnitModel>(
           StreamTransformer.fromHandlers(
@@ -59,7 +62,7 @@ class SaleUnitModel {
   }
 
   static Stream<SaleUnitModel>? stream() {
-    return SystemMDBService.db.collection('saleunits').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(SaleUnitModel.fromMap(data));
@@ -69,14 +72,13 @@ class SaleUnitModel {
   }
 
   Future<SaleUnitModel?> aggregate(List<dynamic> pipeline) async {
-    var d =
-        await SystemMDBService.db.collection('saleunits').aggregate(pipeline);
+    var d = await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
     return SaleUnitModel.fromMap(d);
   }
 
   static Future<SaleUnitModel?> findById(int id) async {
     var d = await SystemMDBService.db
-        .collection('saleunits')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -85,7 +87,7 @@ class SaleUnitModel {
   }
 
   Future<SaleUnitModel?> edit() async {
-    var r = await SystemMDBService.db.collection('saleunits').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -94,7 +96,7 @@ class SaleUnitModel {
   }
 
   Future<int> delete(String id) async {
-    var r = await SystemMDBService.db.collection('saleunits').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     // print(r);
@@ -102,7 +104,7 @@ class SaleUnitModel {
   }
 
   Future<int> add() async {
-    var r = await SystemMDBService.db.collection('saleunits').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     // print(r);

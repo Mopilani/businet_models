@@ -7,6 +7,8 @@ import '../../utils/system_db.dart';
 import 'delivery_driver_model.dart';
 
 class DeliveryModel {
+  static const String collectionName = 'deliveryOrders';
+
   dynamic id;
   late DeliveryDriverModel deliveryDriverModel;
   late String fromAddress;
@@ -17,7 +19,8 @@ class DeliveryModel {
   static DeliveryModel fromMap(Map<String, dynamic> data) {
     DeliveryModel model = DeliveryModel();
     model.id = data['id'];
-    model.deliveryDriverModel = DeliveryDriverModel.fromMap(data['deliveryDriverModel']);
+    model.deliveryDriverModel =
+        DeliveryDriverModel.fromMap(data['deliveryDriverModel']);
     model.fromAddress = data['fromAddress'];
     model.toAddress = data['toAddress'];
     model.fromPoint = data['fromPoint'];
@@ -40,9 +43,8 @@ class DeliveryModel {
     return fromMap(json.decode(jsn));
   }
 
-  
   Stream<DeliveryModel>? stream() {
-    return SystemMDBService.db.collection('deliveryOrders').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(DeliveryModel.fromMap(data));
@@ -52,14 +54,17 @@ class DeliveryModel {
   }
 
   Future<DeliveryModel?> aggregate(List<dynamic> pipeline) async {
-    var d = await SystemMDBService.db.collection('deliveryOrders').aggregate(pipeline);
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .aggregate(pipeline);
 
     return DeliveryModel.fromMap(d);
   }
 
   Future<DeliveryModel?> get(String id) async {
-    var d =
-        await SystemMDBService.db.collection('deliveryOrders').findOne(where.eq('id', id));
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .findOne(where.eq('id', id));
     if (d == null) {
       return null;
     }
@@ -67,17 +72,17 @@ class DeliveryModel {
   }
 
   Future<DeliveryModel?> findByName(String name, String id) async {
-    var d =
-        await SystemMDBService.db.collection('deliveryOrders').findOne(where.eq('id', id));
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .findOne(where.eq('id', id));
     if (d == null) {
       return null;
     }
     return DeliveryModel.fromMap(d);
   }
 
-  Future<DeliveryModel?> edit(
-      String id, Map<String, dynamic> document) async {
-    var r = await SystemMDBService.db.collection('deliveryOrders').update(
+  Future<DeliveryModel?> edit(String id, Map<String, dynamic> document) async {
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           document,
         );
@@ -86,7 +91,7 @@ class DeliveryModel {
   }
 
   Future<int> delete(String id) async {
-    var r = await SystemMDBService.db.collection('deliveryOrders').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     print(r);
@@ -94,7 +99,7 @@ class DeliveryModel {
   }
 
   Future<int> add(DeliveryModel product) async {
-    var r = await SystemMDBService.db.collection('deliveryOrders').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           product.toMap(),
         );
     print(r);

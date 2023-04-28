@@ -47,6 +47,8 @@ class ProcessesModel {
     _setModel(this);
   }
 
+  static String collectionName = 'processes';
+
   late int id;
   // late String catgoryName;
   int lastTicketId = 0;
@@ -269,7 +271,8 @@ class ProcessesModel {
       lastPatientId: lastPatientId ?? this.lastPatientId,
       lastNoteId: lastNoteId ?? this.lastNoteId,
       lastReceiptId: lastReceiptId ?? this.lastReceiptId,
-      lastSuspendedReceiptId: lastSuspendedReceiptId ?? this.lastSuspendedReceiptId,
+      lastSuspendedReceiptId:
+          lastSuspendedReceiptId ?? this.lastSuspendedReceiptId,
       lastActionId: lastActionId ?? this.lastActionId,
       lastMedicalServiceId: lastMedicalServiceId ?? this.lastMedicalServiceId,
       lastSaleUnitId: lastSaleUnitId ?? this.lastSaleUnitId,
@@ -316,16 +319,16 @@ class ProcessesModel {
     return fromMap(json.decode(jsn));
   }
 
-  static ProcessesModel? get stored => SystemCache.get('processes');
+  static ProcessesModel? get stored => SystemCache.get(collectionName);
   void setModel(ProcessesModel processes) =>
-      SystemCache.set('processes', processes);
+      SystemCache.set(collectionName, processes);
   static void _setModel(ProcessesModel? processes) =>
-      SystemCache.set('processes', processes);
+      SystemCache.set(collectionName, processes);
 
-  // static void _deleteModel() => SystemCache.remove('processes');
+  // static void _deleteModel() => SystemCache.remove(collectionName);
 
   static Stream<ProcessesModel>? stream() {
-    return SystemMDBService.db.collection('processes').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(ProcessesModel.fromMap(data));
@@ -479,15 +482,16 @@ class ProcessesModel {
   // }
 
   Future<ProcessesModel?> aggregate(List<dynamic> pipeline) async {
-    var d =
-        await SystemMDBService.db.collection('processes').aggregate(pipeline);
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .aggregate(pipeline);
 
     return ProcessesModel.fromMap(d);
   }
 
   static Future<ProcessesModel?> get(int id) async {
     var d = await SystemMDBService.db
-        .collection('processes')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       throw 'null';
@@ -499,7 +503,7 @@ class ProcessesModel {
 
   Future<ProcessesModel?> findByShiftNumber(int shiftNumber) async {
     var d = await SystemMDBService.db
-        .collection('processes')
+        .collection(collectionName)
         .findOne(where.eq('shiftNumber', shiftNumber));
     if (d == null) {
       return null;
@@ -508,7 +512,7 @@ class ProcessesModel {
   }
 
   Future<ProcessesModel> edit() async {
-    var r = await SystemMDBService.db.collection('processes').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -520,7 +524,7 @@ class ProcessesModel {
   }
 
   Future<int> delete() async {
-    var r = await SystemMDBService.db.collection('processes').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     print(r);
@@ -528,7 +532,7 @@ class ProcessesModel {
   }
 
   Future<int> add() async {
-    var r = await SystemMDBService.db.collection('processes').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     print(r);

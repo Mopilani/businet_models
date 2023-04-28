@@ -24,6 +24,8 @@ class SystemConfig {
     return _runtimeStoredInstance!;
   }
 
+  static String collectionName = 'sysconfig';
+
   SystemConfig.init([SystemConfig? $with]) {
     if ($with != null) {
       id = $with.id;
@@ -39,6 +41,7 @@ class SystemConfig {
       _syncOperationsState = $with.syncOperationsState;
       _firstStart = $with.firstStart;
     }
+    _runtimeStoredInstance = this;
   }
 
   static Map<String, dynamic> systemConfig = <String, dynamic>{};
@@ -151,15 +154,15 @@ class SystemConfig {
 
   static Future<SystemConfig?> get() async {
     var r = await SystemMDBService.db
-        .collection('sysconfig')
+        .collection(collectionName)
         .findOne(where.eq('id', 0));
-    // var v = await SystemMDBService.db.collection('sysconfig').find().toList();
+    // var v = await SystemMDBService.db.collection(collectionName).find().toList();
 
     // print(v);
     // v.listen((event) {
-      print('-----------------');
-      print(r);
-      print('-----------------');
+    print('-----------------');
+    print(r);
+    print('-----------------');
     // });
     if (r == null) {
       return null;
@@ -169,7 +172,7 @@ class SystemConfig {
   }
 
   Future<void> edit() async {
-    await SystemMDBService.db.collection('sysconfig').update(
+    await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', 0),
           asMap(),
         );
@@ -179,7 +182,7 @@ class SystemConfig {
     print('============');
 
     var r = await SystemMDBService.db
-        .collection('sysconfig')
+        .collection(collectionName)
         .findOne(where.eq('id', 0));
 
     print(fromMap(r!).asMap());
@@ -189,11 +192,11 @@ class SystemConfig {
     // SystemConfig.init(r);
   }
 
-  // Future<void> add() async {
-  //   await SystemMDBService.db.collection('sysconfig').insert(
-  //         asMap(),
-  //       );
-  // }
+  Future<void> add() async {
+    await SystemMDBService.db.collection(collectionName).insert(
+          asMap(),
+        );
+  }
 
   asMap() => {
         'id': id,

@@ -18,6 +18,8 @@ class ActionModel {
     user = UserModel.stored!;
   }
 
+    static String collectionName = 'actions';
+
   static SyncService? syncSvc;
 
   static set registerSync(SyncService service) {
@@ -61,7 +63,7 @@ class ActionModel {
   static Future<List<ActionDataModel>> getAll() async {
     List<ActionDataModel> result = [];
     return SystemMDBService.db
-        .collection('actions')
+        .collection(collectionName)
         .find()
         .transform<ActionDataModel>(
           StreamTransformer.fromHandlers(
@@ -78,7 +80,7 @@ class ActionModel {
   }
 
   static Stream<ActionDataModel> stream() {
-    return SystemMDBService.db.collection('actions').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           // print(data);
@@ -89,14 +91,14 @@ class ActionModel {
   }
 
   Future<ActionDataModel?> aggregate(List<dynamic> pipeline) async {
-    var d = await SystemMDBService.db.collection('actions').aggregate(pipeline);
+    var d = await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
 
     return ActionDataModel.fromMap(d);
   }
 
   Future<ActionDataModel?> get(String id) async {
     var d = await SystemMDBService.db
-        .collection('actions')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -119,7 +121,7 @@ class ActionModel {
   }
   // Future<ActionModel?> findByName(String name, String id) async {
   //   var d = await SystemMDBService.db
-  //       .collection('actions')
+  //       .collection(collectionName)
   //       .findOne(where.eq('id', id));
   //   if (d == null) {
   //     return null;
@@ -128,7 +130,7 @@ class ActionModel {
   // }
 
   // Future<ActionModel?> edit(String id, Map<String, dynamic> document) async {
-  //   var r = await SystemMDBService.db.collection('actions').update(
+  //   var r = await SystemMDBService.db.collection(collectionName).update(
   //         where.eq('id', id),
   //         document,
   //       );
@@ -137,7 +139,7 @@ class ActionModel {
   // }
 
   // Future<int> delete(String id) async {
-  //   var r = await SystemMDBService.db.collection('actions').remove(
+  //   var r = await SystemMDBService.db.collection(collectionName).remove(
   //         where.eq('id', id),
   //       );
   //   print(r);
@@ -145,15 +147,17 @@ class ActionModel {
   // }
 
   // Future<int> add() async {
-  //   var r = await SystemMDBService.db.collection('actions').insert(
+  //   var r = await SystemMDBService.db.collection(collectionName).insert(
   //         toMap(),
   //       );
   //   print(r);
   //   return 1;
   // }
 
+
+
   static Future<int> addData(ActionDataModel actionData) async {
-    var r = await SystemMDBService.db.collection('actions').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           actionData.toMap(),
         );
     print(r);
@@ -689,7 +693,7 @@ class ActionModel {
       metaData: metaData,
       time: DateTime.now(),
     );
-    var r = await SystemMDBService.db.collection('actions').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           actionData.toMap(),
         );
     await syncSvc?.sendAction(actionData);

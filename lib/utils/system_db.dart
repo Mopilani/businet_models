@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 
 import 'global_state.dart';
 import 'hcol.dart';
+import 'package:hive/hive.dart';
 
 class SMDB extends SystemMDBService {
   SMDB({
@@ -12,12 +14,14 @@ class SMDB extends SystemMDBService {
     String username = 'businet',
     String password = 'businet',
     bool auth = true,
+    bool useMongo = true,
   }) : super(
           hiveDBPath: hiveDBPath,
           mongoDBUriString: mongoDBUriString,
           username: username,
           password: password,
           auth: auth,
+          useMongo: useMongo,
         );
 
   static Future<void> useMain() async {
@@ -29,6 +33,21 @@ class SMDB extends SystemMDBService {
   static DBMeta? currentDb;
 
   static List<DBMeta> sysMdbs = [];
+
+  static void register(List<String> _collectionNames) {
+    for (var collectionName in _collectionNames) {
+      collectionNames.add(collectionName);
+    }
+  }
+
+  static Future<void> loadBoxes() async {
+    print('Collections: $collectionNames');
+    for (var collectionName in collectionNames) {
+      await Hive.openBox<Map>(collectionName);
+    }
+  }
+
+  static List<String> collectionNames = [];
 }
 
 class SystemMDBService {
@@ -38,6 +57,7 @@ class SystemMDBService {
     this.username = 'businet',
     this.password = 'businet',
     this.auth = true,
+    this.useMongo = false,
   });
 
   final String mongoDBUriString;
@@ -45,15 +65,19 @@ class SystemMDBService {
   final String username;
   final String password;
   final bool auth;
+  final bool useMongo;
 
   Db? _db;
 
   Future<Db?> init() async {
-    print('Initializing DB $mongoDBUriString');
-    if (Platform.isAndroid) {
-      _db = HDb(hiveDBPath);
+    if (Platform.isAndroid && !useMongo) {
+      var docDir = await path_provider.getApplicationDocumentsDirectory();
+      var dbPath = docDir.path + '/' + hiveDBPath;
+      _db = HDb(dbPath);
+      print('Initializing HDB $dbPath');
     } else {
       _db = Db(mongoDBUriString);
+      print('Initializing MDB $mongoDBUriString');
     }
 
     try {
@@ -81,6 +105,7 @@ class SystemMDBService {
     username = 'businet',
     password = 'businet',
     auth = true,
+    useMongo = false,
   }) async {
     await SystemMDBService.db.close().then((value) async {
       await SystemMDBService(
@@ -89,9 +114,30 @@ class SystemMDBService {
         password: password,
         username: username,
         auth: auth,
+        useMongo: useMongo,
       ).init();
     });
   }
+
+  static SystemMDBService fromMap(Map data) {
+    return SystemMDBService(
+      hiveDBPath: data['hiveDBPath'],
+      mongoDBUriString: data['mongoDBUriString'],
+      auth: data['auth'],
+      useMongo: data['useMongo'],
+      password: data['password'],
+      username: data['username'],
+    );
+  }
+
+  Map toMap() => {
+        'hiveDBPath': hiveDBPath,
+        'mongoDBUriString': mongoDBUriString,
+        'auth': auth,
+        'useMongo': useMongo,
+        'password': password,
+        'username': username,
+      };
 
   Future<void> resetDb() async {}
 
@@ -109,6 +155,20 @@ class DBMeta {
   String name;
   String description;
   SystemMDBService sysMDB;
+
+  static DBMeta fromJson(Map map) {
+    return DBMeta(
+      map['name'],
+      map['description'],
+      SystemMDBService.fromMap(map['sysMDB']),
+    );
+  }
+
+  Map toMap() => {
+        'name': name,
+        'description': description,
+        'sysMDB': sysMDB.toMap(),
+      };
 }
 
 class BusinetDBError extends Error {

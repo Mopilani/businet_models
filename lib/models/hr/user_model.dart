@@ -18,6 +18,7 @@ class UserModel {
     required this.lastname,
     required this.phoneNumber,
     required this.accessLevelModel,
+    this.imageUrl,
   });
 
   int id;
@@ -27,6 +28,7 @@ class UserModel {
   late String firstname;
   late String lastname;
   late String phoneNumber;
+  String? imageUrl;
   AccessLevelModel? accessLevelModel;
 
   static UserModel? get stored => SystemCache.get('user');
@@ -44,9 +46,10 @@ class UserModel {
       password: data['password'],
       firstname: data['firstname'],
       lastname: data['lastname'],
+      imageUrl: data['imageUrl'],
       phoneNumber: data['phoneNumber'],
       accessLevelModel: data['accessLevelModel'] != null
-          ? AccessLevelModel.fromMap(data['accessLevelModel'])
+          ? AccessLevelModel.fromMap({...data['accessLevelModel']})
           : null,
     );
     return user;
@@ -59,6 +62,7 @@ class UserModel {
         'firstname': firstname,
         'lastname': lastname,
         'phoneNumber': phoneNumber,
+        'imageUrl': imageUrl,
         // 'levelNumber': levelNumber,
         'accessLevelModel': accessLevelModel?.toMap(),
       };

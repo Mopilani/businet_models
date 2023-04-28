@@ -8,10 +8,16 @@ import 'sales/sku_model.dart';
 
 class CategoryModel {
   CategoryModel._();
-  CategoryModel(this.id, this.catgoryName, this.catgoryDescription);
+  CategoryModel(
+    this.id,
+    this.catgoryName,
+    this.catgoryDescription, {
+    this.imageUrl,
+  });
   dynamic id;
   late String catgoryName;
   late String catgoryDescription;
+  String? imageUrl;
 
   static const String collectionName = 'categories';
 
@@ -20,6 +26,7 @@ class CategoryModel {
     model.id = data['id'];
     model.catgoryName = data['catgoryName'];
     model.catgoryDescription = data['catgoryDescription'];
+    model.imageUrl = data['imageUrl'];
     return model;
   }
 
@@ -27,6 +34,7 @@ class CategoryModel {
         'id': id,
         'catgoryName': catgoryName,
         'catgoryDescription': catgoryDescription,
+        'imageUrl': imageUrl,
       };
 
   String toJson() => json.encode(toMap());
@@ -65,8 +73,9 @@ class CategoryModel {
   }
 
   Future<CategoryModel?> aggregate(List<dynamic> pipeline) async {
-    var d =
-        await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .aggregate(pipeline);
 
     return CategoryModel.fromMap(d);
   }

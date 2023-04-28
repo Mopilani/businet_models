@@ -113,7 +113,7 @@ class SystemNodeModel {
     model.country = data['country'];
     model.balance = data['balance'];
     model.deviceName = data['deviceName'];
-    model.metadata = data['metadata'];
+    model.metadata = {...data['metadata']};
     model.printerName = data['printerName'];
     model.groupId = data['groupId'];
     model.deviceId = data['deviceId'];

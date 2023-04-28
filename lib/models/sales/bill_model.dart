@@ -98,6 +98,8 @@ class BillModel {
     required this.billPaymentMethods,
   });
 
+  static const String collectionName = 'bills';
+
   late int id;
   String? note;
   BillType? billType;
@@ -121,7 +123,7 @@ class BillModel {
   late SupplierModel supplierModel;
 
   static BillModel fromMap(Map<String, dynamic> data) {
-    // SystemMDBService.db.collection('bills').drop();
+    // SystemMDBService.db.collection(collectionName).drop();
     var bill = BillModel(
       data['id'],
       note: data['note'],
@@ -208,7 +210,7 @@ class BillModel {
   static Future<List<BillModel>> getAll() async {
     List<BillModel> result = [];
     return SystemMDBService.db
-        .collection('bills')
+        .collection(collectionName)
         .find()
         .transform<BillModel>(
           StreamTransformer.fromHandlers(
@@ -225,7 +227,7 @@ class BillModel {
   }
 
   static Stream<BillModel> stream() {
-    return SystemMDBService.db.collection('bills').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
           StreamTransformer.fromHandlers(
             handleData: (data, sink) {
               sink.add(BillModel.fromMap(data));
@@ -238,13 +240,15 @@ class BillModel {
   }
 
   Future<BillModel?> aggregate(List<dynamic> pipeline) async {
-    var d = await SystemMDBService.db.collection('bills').aggregate(pipeline);
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .aggregate(pipeline);
 
     return BillModel.fromMap(d);
   }
 
   static Future<BillModel?> get(int id, [billType]) async {
-    var d = await SystemMDBService.db.collection('bills').findOne(
+    var d = await SystemMDBService.db.collection(collectionName).findOne(
           billType != null
               ? where.eq('id', id).eq(
                     'billType',
@@ -260,7 +264,7 @@ class BillModel {
 
   Future<BillModel?> findByName(String name) async {
     var d = await SystemMDBService.db
-        .collection('bills')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -269,7 +273,7 @@ class BillModel {
   }
 
   Future<BillModel> edit([Map<String, BillEntryModel>? newBillEntries]) async {
-    var r = await SystemMDBService.db.collection('bills').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id).eq('billType', billType.toString()),
           toMap(),
         );
@@ -278,7 +282,7 @@ class BillModel {
     //   var expectedBill = await get(id);
     //   if (expectedBill != null && expectedBill.billType == billType) {
     //     expectedBill.billEntries = newBillEntries;
-    //     await SystemMDBService.db.collection('bills').insert(
+    //     await SystemMDBService.db.collection(collectionName).insert(
     //           expectedBill.toMap(),
     //         );
     //   }
@@ -296,7 +300,7 @@ class BillModel {
     // }
     // var expectedBill = await get(id);
     // if (expectedBill != null && expectedBill.billType == billType) {}
-    var r = await SystemMDBService.db.collection('bills').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     await ActionModel.createdBill(this, id);

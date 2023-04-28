@@ -13,6 +13,8 @@ import 'sku_model.dart';
 class StockModel {
   StockModel._();
 
+  static const String collectionName = 'stocks';
+
   StockModel(
     this.id, {
     required this.title,
@@ -166,7 +168,7 @@ class StockModel {
   static Future<List<StockModel>> getAll() async {
     List<StockModel> result = [];
     return SystemMDBService.db
-        .collection('stocks')
+        .collection(collectionName)
         .find()
         .transform<StockModel>(
           StreamTransformer.fromHandlers(
@@ -183,7 +185,7 @@ class StockModel {
   }
 
   Stream<StockModel>? stream() {
-    return SystemMDBService.db.collection('stocks').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(StockModel.fromMap(data));
@@ -193,14 +195,14 @@ class StockModel {
   }
 
   Future<StockModel?> aggregate(List<dynamic> pipeline) async {
-    var d = await SystemMDBService.db.collection('stocks').aggregate(pipeline);
+    var d = await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
 
     return StockModel.fromMap(d);
   }
 
   static Future<StockModel?> get(int id) async {
     var d = await SystemMDBService.db
-        .collection('stocks')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -210,7 +212,7 @@ class StockModel {
 
   static Future<StockModel?> findByTitle(String title) async {
     var d = await SystemMDBService.db
-        .collection('stocks')
+        .collection(collectionName)
         .findOne(where.eq('title', title));
     if (d == null) {
       return null;
@@ -220,7 +222,7 @@ class StockModel {
 
   static Future<StockModel?> findById(int id) async {
     var d = await SystemMDBService.db
-        .collection('stocks')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -229,7 +231,7 @@ class StockModel {
   }
 
   Future<StockModel> edit() async {
-    var r = await SystemMDBService.db.collection('stocks').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -238,7 +240,7 @@ class StockModel {
   }
 
   Future<int> delete(int id) async {
-    var r = await SystemMDBService.db.collection('stocks').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     print(r);
@@ -246,7 +248,7 @@ class StockModel {
   }
 
   Future<int> add() async {
-    var r = await SystemMDBService.db.collection('stocks').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     print(r);
@@ -254,7 +256,7 @@ class StockModel {
   }
 
   // static Future<int> addd(StockModel model) async {
-  //   var r = await SystemMDBService.db.collection('stocks').insert(
+  //   var r = await SystemMDBService.db.collection(collectionName).insert(
   //         model.toMap(),
   //       );
   //   print(r);

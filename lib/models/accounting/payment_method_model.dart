@@ -14,6 +14,9 @@ class PaymentMethodModel {
     required this.postPayMethod,
     this.tax,
   });
+
+  static const String collectionName = 'PayMethods';
+
   late int id;
   late String methodName;
   late String currency;
@@ -45,7 +48,7 @@ class PaymentMethodModel {
   static Future<List<PaymentMethodModel>> getAll() {
     List<PaymentMethodModel> catgs = [];
     return SystemMDBService.db
-        .collection('PayMethods')
+        .collection(collectionName)
         .find()
         .transform<PaymentMethodModel>(
           StreamTransformer.fromHandlers(
@@ -62,7 +65,7 @@ class PaymentMethodModel {
   }
 
   static Stream<PaymentMethodModel>? stream() {
-    return SystemMDBService.db.collection('PayMethods').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(PaymentMethodModel.fromMap(data));
@@ -72,15 +75,16 @@ class PaymentMethodModel {
   }
 
   Future<PaymentMethodModel?> aggregate(List<dynamic> pipeline) async {
-    var d =
-        await SystemMDBService.db.collection('PayMethods').aggregate(pipeline);
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .aggregate(pipeline);
 
     return PaymentMethodModel.fromMap(d);
   }
 
   static Future<PaymentMethodModel?> get(int id) async {
     var d = await SystemMDBService.db
-        .collection('PayMethods')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -90,7 +94,7 @@ class PaymentMethodModel {
 
   Future<PaymentMethodModel?> findByName(String name, String id) async {
     var d = await SystemMDBService.db
-        .collection('PayMethods')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -99,7 +103,7 @@ class PaymentMethodModel {
   }
 
   Future<PaymentMethodModel?> edit() async {
-    var r = await SystemMDBService.db.collection('PayMethods').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -108,7 +112,7 @@ class PaymentMethodModel {
   }
 
   Future<int> delete(String id) async {
-    var r = await SystemMDBService.db.collection('PayMethods').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     print(r);
@@ -116,7 +120,7 @@ class PaymentMethodModel {
   }
 
   Future<int> add() async {
-    var r = await SystemMDBService.db.collection('PayMethods').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     print(r);

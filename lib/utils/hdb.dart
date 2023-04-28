@@ -5,7 +5,7 @@ import 'hcol.dart';
 
 class HDbCollection extends DbCollection {
   late HDb hdb;
-  late Box<Map<String, dynamic>> box;
+  late Box<Map<dynamic, dynamic>> box;
 
   @override
   // ignore: overridden_fields
@@ -18,12 +18,18 @@ class HDbCollection extends DbCollection {
     // box = Hive.box<E>(collectionName);
     // }catch (e) {
     //   if(e.toString().contains('Did you forget to call Hive.openBox()')){
-    () async {
-      box = await Hive.openBox<Map<String, dynamic>>(collectionName);
-    }();
-    //   }
-    // }
-    // if (isOpen) {}
+    // () async {
+    //   box = await Hive.box<Map<String, dynamic>>(collectionName);
+    // }()
+    //     .asStream()
+    //     .listen(
+    //   (event) {},
+    //   onDone: () {
+    //     print('Stream Done 1');
+    //   },
+    // );
+    box = Hive.box<Map<dynamic, dynamic>>(collectionName);
+    // print('Stream Done 2');
   }
 
   bool get isOpen => box.isOpen;
@@ -52,21 +58,45 @@ class HDbCollection extends DbCollection {
 
   @override
   Stream<Map<String, dynamic>> find([selector]) async* {
-    var kSelector = selector as SelectorBuilder;
-    MapEntry entry;
-    for (var element in kSelector.map.entries) {
-      if (element.value is String) {
-        if (!element.key.contains('comment') || !element.key.contains('hint')) {
-          entry = element;
-          for (Map<String, dynamic> value in <Map<String, dynamic>>[
-            ...box.values
-          ]) {
-            if (value[entry.key] == entry.value) {
-              yield value;
-            }
-          }
-          break;
+    var kSelector = selector as SelectorBuilder?;
+    print(kSelector?.paramLimit);
+    print(kSelector?.paramSkip);
+    if (selector != null) {
+      MapEntry entry;
+      List<Map<dynamic, dynamic>> items;
+      if (kSelector!.paramLimit > 0) {
+        int limit = kSelector!.paramLimit;
+        var count = 0;
+        items = box.values.toList();
+        print('items: $items');
+        for (var index = kSelector!.paramSkip; index < items.length; index++) {
+          var value = items[index];
+          count++;
+          if (count >= limit) break;
+          print(value);
+          yield {...value};
         }
+      } else {
+        items = <Map<dynamic, dynamic>>[];
+      }
+
+      for (var element in kSelector!.map.entries) {
+        if (element.value is String) {
+          if (!element.key.contains('comment') ||
+              !element.key.contains('hint')) {
+            entry = element;
+            for (Map<dynamic, dynamic> value in [...items]) {
+              if (value[entry.key] == entry.value) {
+                yield {...value};
+              }
+            }
+            break;
+          }
+        }
+      }
+    } else {
+      for (Map<dynamic, dynamic> value in [...box.values]) {
+        yield {...value};
       }
     }
     // return Stream.fromIterable(<Map<String, dynamic>>[...box.values]);
@@ -81,23 +111,56 @@ class HDbCollection extends DbCollection {
       // if (element.value is String) {
       if (element.key == '\$query') {
         // if (!element.key.contains('comment') && !element.key.contains('hint')) {
-        if ((element.value as Map).keys.contains('id')) {
-          map = element.value;
-          print('The map is: $map');
-          for (var value in box.values) {
-            var desiredSimilarityCount = map.entries.length;
-            var foundSimilarityCount = 0;
-            for (MapEntry entry in map.entries) {
-              if (value[entry.key] == entry.value) {
-                foundSimilarityCount++;
-              }
-            }
-            if (foundSimilarityCount == desiredSimilarityCount) {
-              return value;
+
+        // if ((element.value as Map).keys.contains('id')) {
+        // map = element.value;
+        // print('The map is: $map');
+        // print('box.values: ${box.values}');
+        //   for (var value in box.values) {
+        //     bool checkWantedEntries() {
+        //       for (var entry in (element.value as Map).entries) {
+        //         if (value[entry.key] == element.value[entry.value]) {}
+        //       }
+        //       return true;
+        //     }
+
+        //     var r = checkWantedEntries();
+        //     if(r) {
+
+        //     }
+
+        // var desiredSimilarityCount = map.entries.length;
+        // var foundSimilarityCount = 0;
+        // for (MapEntry entry in map.entries) {
+        //   if (value[entry.key] == entry.value) {
+        //     foundSimilarityCount++;
+        //   }
+        // }
+        // if (foundSimilarityCount == desiredSimilarityCount) {
+        //   return {...value};
+        // }
+        //   }
+        //   break;
+        // }
+
+        // if ((element.value as Map).keys.contains('id')) {
+        map = element.value;
+        print('The map is: $map');
+        print('box.values: ${box.values}');
+        for (var value in box.values) {
+          var desiredSimilarityCount = map.entries.length;
+          var foundSimilarityCount = 0;
+          for (MapEntry entry in map.entries) {
+            if (value[entry.key] == entry.value) {
+              foundSimilarityCount++;
             }
           }
-          break;
+          if (foundSimilarityCount == desiredSimilarityCount) {
+            return {...value};
+          }
         }
+        break;
+        // }
       }
     }
     return null;
