@@ -20,7 +20,7 @@ class ReceiptPaymentMethodEntryModel {
   static ReceiptPaymentMethodEntryModel fromMap(Map<String, dynamic> data) {
     return ReceiptPaymentMethodEntryModel(
       data['id'],
-      paymentMethod: PaymentMethodModel.fromMap(data['paymentMethod']),
+      paymentMethod: PaymentMethodModel.fromMap({...data['paymentMethod']}),
       value: data['value'],
     );
   }
@@ -46,7 +46,7 @@ class BillPaymentMethodEntryModel {
   static BillPaymentMethodEntryModel fromMap(Map<String, dynamic> data) {
     return BillPaymentMethodEntryModel(
       data['id'],
-      paymentMethod: PaymentMethodModel.fromMap(data['paymentMethod']),
+      paymentMethod: PaymentMethodModel.fromMap({...data['paymentMethod']}),
       value: data['value'],
     );
   }

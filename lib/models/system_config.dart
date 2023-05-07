@@ -31,6 +31,7 @@ class SystemConfig {
       id = $with.id;
       _printer = $with.printer;
       _theme = $with.theme;
+      _locale = $with.locale;
       _invoicesSaveDirectoryPath = $with.invoicesSaveDirectoryPath;
       _pageRoute = $with.pageRoute;
       _animations = $with.animations;
@@ -49,9 +50,10 @@ class SystemConfig {
   static SystemConfig? stored = _runtimeStoredInstance;
 
   int id = 0;
-  String get invoicesSaveDirectoryPath => _invoicesSaveDirectoryPath!;
+  String get invoicesSaveDirectoryPath => _invoicesSaveDirectoryPath ?? '';
   String get pageRoute => _pageRoute ?? 'CupertinoPageRoute';
   String get theme => _theme!;
+  String get locale => _locale!;
   String get salesType => _salesType!;
   bool get animations => _animations;
   bool get runSyncService => _runSyncService;
@@ -108,7 +110,16 @@ class SystemConfig {
   set theme(String? v) {
     _theme = v;
     if (!notUpdate) {
-      edit().asStream();
+      // edit().asStream();
+      editField('theme', theme);
+    }
+  }
+
+  set locale(String? v) {
+    _locale = v;
+    if (!notUpdate) {
+      // edit();
+      editField('locale', locale);
     }
   }
 
@@ -171,17 +182,44 @@ class SystemConfig {
     return model;
   }
 
+  Future<void> editField(String fieldName, dynamic value) async {
+    // await SystemMDBService.db.collection(collectionName).drop();
+    // // .listen((event) {
+    // //   print(event);
+    // // });
+    // await SystemMDBService.db.collection(collectionName).insert(
+    //       asMap(),
+    //     );
+    var r2 = await SystemMDBService.db
+        .collection(collectionName)
+        .findOne(where.eq('id', 0));
+    r2!.addAll({fieldName: value});
+    dynamic r = await SystemMDBService.db.collection(collectionName).update(
+          where.eq('id', 0),
+          fromMap(r2).asMap(),
+        );
+
+    print(r);
+
+    // print('============');
+    // print(asMap());
+    // print('============');
+
+    // fromMap(r2!).asMap();
+  }
+
   Future<void> edit() async {
-    await SystemMDBService.db.collection(collectionName).update(
+    dynamic r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', 0),
           asMap(),
         );
 
     print('============');
-    print(asMap());
+    print(r);
+    // print(asMap());
     print('============');
 
-    var r = await SystemMDBService.db
+    r = await SystemMDBService.db
         .collection(collectionName)
         .findOne(where.eq('id', 0));
 
@@ -204,6 +242,7 @@ class SystemConfig {
         'printer': printer,
         'salesType': salesType,
         'theme': theme,
+        'locale': locale,
         'animations': animations,
         'runSyncService': runSyncService,
         'svnamas': svnamas,
@@ -216,12 +255,14 @@ class SystemConfig {
     var model = SystemConfig.init();
     print('+_________++++++');
     print(sysconfigData);
+    print('+_________++++++');
 
     notUpdate = true;
     model.invoicesSaveDirectoryPath =
         sysconfigData['invoicesSaveDirectoryPath'];
-    model.printer = sysconfigData['printer'];
-    model.theme = sysconfigData['theme'];
+    model.printer = sysconfigData['printer'] ?? 'Microsoft Print to PDF';
+    model.theme = sysconfigData['theme'] ?? 'light';
+    model.locale = sysconfigData['locale'] ?? 'ar_SD';
     model.salesType = sysconfigData['salesType'];
     model.animations = sysconfigData['animations'] ?? true;
     model.runSyncService = sysconfigData['runSyncService'] ?? true;
@@ -286,6 +327,7 @@ List<String>? _svnamas;
 String? _pageRoute;
 String? _printer;
 String? _theme = 'light';
+String? _locale = 'ar_SD';
 String? _salesType = 'mall';
 bool _animations = true;
 bool _runSyncService = true;

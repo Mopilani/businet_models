@@ -25,17 +25,9 @@ class ReceiptEntryModel {
         'tax': tax,
       };
 
-  // String toJson() {
-  //   return json.encode(toMap());
-  // }
-
-  // static ReceiptEntryModel fromJson(String jsn) {
-  //   return fromMap(json.decode(jsn));
-  // }
-
   static ReceiptEntryModel fromMap(Map<String, dynamic> data) {
     return ReceiptEntryModel(
-      skuModel: SKUModel.fromMap(data['skuModel']),
+      skuModel: SKUModel.fromMap({...data['skuModel']}),
       quantity: data['quantity'],
       total: data['total'],
       tax: data['tax'],

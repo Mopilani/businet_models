@@ -42,6 +42,7 @@ class ProcessesModel {
     this.shiftStarted = false,
     // this.lastTaskId,
     this.lastActionId = 0,
+    this.lastCreditId = 0,
   }) {
     currentDaty;
     _setModel(this);
@@ -73,6 +74,7 @@ class ProcessesModel {
 
   int lastSaleUnitId = 0;
   int lastActionId = 0;
+  int lastCreditId = 0;
   int shiftNumber = 1;
   bool dayStarted = false;
   bool shiftStarted = false;
@@ -106,6 +108,7 @@ class ProcessesModel {
     model.lastNoteId = data['lastNoteId'] ?? 1;
     model.lastMedicalServiceId = data['lastMedicalServiceId'] ?? 1;
     model.lastActionId = data['lastActionId'] ?? 0;
+    model.lastCreditId = data['lastCreditId'] ?? 0;
     model.lastReceiptId = data['lastReceiptId'] ?? 0;
     model.lastSuspendedReceiptId = data['lastSuspendedReceiptId'] ?? 1;
 
@@ -123,6 +126,12 @@ class ProcessesModel {
     lastActionId++;
     await edit();
     return lastActionId;
+  }
+
+  Future<int> requestCreditId() async {
+    lastCreditId++;
+    await edit();
+    return lastCreditId;
   }
 
   Future<int> requestLabAnalysisId() async {
@@ -244,6 +253,7 @@ class ProcessesModel {
     int? lastDialyId,
     int? lastPatientId,
     int? lastActionId,
+    int? lastCreditId,
     int? lastReceiptId,
     int? lastSuspendedReceiptId,
     int? lastNoteId,
@@ -274,6 +284,7 @@ class ProcessesModel {
       lastSuspendedReceiptId:
           lastSuspendedReceiptId ?? this.lastSuspendedReceiptId,
       lastActionId: lastActionId ?? this.lastActionId,
+      lastCreditId: lastCreditId ?? this.lastCreditId,
       lastMedicalServiceId: lastMedicalServiceId ?? this.lastMedicalServiceId,
       lastSaleUnitId: lastSaleUnitId ?? this.lastSaleUnitId,
       businessDay: businessDay ?? this.businessDay,
@@ -303,6 +314,7 @@ class ProcessesModel {
         'lastPatientId': lastPatientId,
         'lastSaleUnitId': lastSaleUnitId,
         'lastActionId': lastActionId,
+        'lastCreditId': lastCreditId,
         'businessDay': businessDay,
         'currentDaty': currentDaty,
         'dayStarted': dayStarted,

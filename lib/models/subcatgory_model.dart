@@ -33,7 +33,7 @@ class SubCatgModel {
     model.imageUrl = data['imageUrl'];
     data['category'] == null
         ? null
-        : model.category = CategoryModel.fromMap(data['category']);
+        : model.category = CategoryModel.fromMap({...data['category']});
     return model;
   }
 
@@ -87,8 +87,9 @@ class SubCatgModel {
   }
 
   Future<SubCatgModel?> aggregate(List<dynamic> pipeline) async {
-    var d =
-        await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
+    var d = await SystemMDBService.db
+        .collection(collectionName)
+        .aggregate(pipeline);
 
     return SubCatgModel.fromMap(d);
   }

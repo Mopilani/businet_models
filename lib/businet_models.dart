@@ -1,6 +1,8 @@
 library businet_models;
 
 export 'models/accounting/credit_model.dart';
+export 'models/accounting/statics_model.dart';
+export 'models/accounting/user_lite_model.dart';
 export 'models/accounting/income_event_model.dart';
 export 'models/accounting/money_account.dart';
 export 'models/accounting/payment_method_model.dart';

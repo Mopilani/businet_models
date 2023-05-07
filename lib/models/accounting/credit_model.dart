@@ -6,8 +6,9 @@ import 'package:mongo_dart/mongo_dart.dart';
 import '../../utils/enums.dart';
 import '../../utils/system_db.dart';
 import '../hr/user_model.dart';
-import 'tree_main_account_model.dart';
+// import 'tree_main_account_model.dart';
 import 'tree_sub_account_model.dart';
+import 'user_lite_model.dart';
 
 class CreditModel {
   CreditModel(
@@ -18,8 +19,10 @@ class CreditModel {
     required this.credit,
     required this.debit,
     required this.notice,
-    required this.mainAccount,
-    required this.subAccount,
+    // required this.mainAccount,
+    // required this.subAccount,
+    required this.fromAccount,
+    required this.toAccount,
     required this.creditDate,
     required this.user,
   }) {
@@ -45,13 +48,15 @@ class CreditModel {
   late DateTime createDate;
   late DateTime creditDate;
   late String notice;
-  late UserModel user;
+  late UserLiteModel user;
   // BillModel? bill;
   // WorkerModel? worker;
   double credit;
   double debit;
-  TreeMainAccountModel mainAccount;
-  TreeSubAccountModel subAccount;
+  // TreeMainAccountModel mainAccount;
+  // TreeSubAccountModel subAccount;
+  TreeSubAccountModel fromAccount;
+  TreeSubAccountModel toAccount;
 
   static const String collectionName = 'credits';
 
@@ -64,9 +69,11 @@ class CreditModel {
       // worker: data['worker'],
       credit: data['credit'],
       debit: data['debit'],
-      mainAccount: TreeMainAccountModel.fromMap(data['mainAccount']),
-      user: UserModel.fromMap(data['user']),
-      subAccount: TreeSubAccountModel.fromMap(data['subAccount']),
+      user: UserLiteModel.fromMap({...data['user']}),
+      // mainAccount: TreeMainAccountModel.fromMap(data['mainAccount']),
+      // subAccount: TreeSubAccountModel.fromMap(data['subAccount']),
+      fromAccount: TreeSubAccountModel.fromMap({...data['fromAccount']}),
+      toAccount: TreeSubAccountModel.fromMap({...data['toAccount']}),
       creditDate: data['creditDate'],
     );
     model.createDate =
@@ -82,8 +89,10 @@ class CreditModel {
         // 'worker': worker,
         'credit': credit,
         'debit': debit,
-        'mainAccount': mainAccount.toMap(),
-        'subAccount': subAccount.toMap(),
+        // 'mainAccount': mainAccount.toMap(),
+        // 'subAccount': subAccount.toMap(),
+        'fromAccount': fromAccount.toMap(),
+        'toAccount': toAccount.toMap(),
         'user': user.toMap(),
         'createDate': createDate,
         'creditDate': creditDate,
@@ -112,6 +121,35 @@ class CreditModel {
         })
         .asFuture()
         .then((value) => catgs);
+  }
+
+  static Future<List<CreditModel>> getOf(String collectionName) {
+    List<CreditModel> catgs = [];
+    return SystemMDBService.db
+        .collection(collectionName)
+        .find()
+        .transform<CreditModel>(
+          StreamTransformer.fromHandlers(
+            handleData: (data, sink) {
+              sink.add(CreditModel.fromMap(data));
+            },
+          ),
+        )
+        .listen((subCatg) {
+          catgs.add(subCatg);
+        })
+        .asFuture()
+        .then((value) => catgs);
+  }
+
+  static Stream<CreditModel> streamOf(String collectionName) {
+    return SystemMDBService.db.collection(collectionName).find().transform(
+      StreamTransformer.fromHandlers(
+        handleData: (data, sink) {
+          sink.add(CreditModel.fromMap(data));
+        },
+      ),
+    );
   }
 
   static Stream<CreditModel> stream() {
@@ -159,7 +197,21 @@ class CreditModel {
     return 1;
   }
 
+  static Future<int> deleteOf(String collectionName) async {
+    var r = await SystemMDBService.db.collection(collectionName).drop();
+    print(r);
+    return 1;
+  }
+
   Future<CreditModel> add() async {
+    var r = await SystemMDBService.db.collection(collectionName).insert(
+          toMap(),
+        );
+    print(r);
+    return this;
+  }
+
+  Future<CreditModel> addTo(String collectionName) async {
     var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );

@@ -32,7 +32,7 @@ class AccessLevelModel {
       levelDescription: data['levelDescription'],
       accessToken: data['accessToken'],
       levelNumber: data['levelNumber'],
-      allowedLevels: {...data['allowedLevels']} ?? {},
+      allowedLevels: {...data['allowedLevels']},
       nodeId: data['nodeId'],
     );
     return model;

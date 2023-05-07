@@ -127,6 +127,7 @@ class SKUModel {
         'openRate': openRate,
         'discountable': discountable,
         'salePercent': salePercent,
+        'images': images,
       };
 
   static SKUModel fromMap(Map<String, dynamic> data) {
@@ -140,11 +141,12 @@ class SKUModel {
     newModel.expierDate = stringOrDateTime(data['expierDate']);
     newModel.lastUpdate = stringOrDateTime(data['lastUpdate']);
     newModel.productionDate = stringOrDateTime(data['productionDate']);
-    newModel.saleUnitModel = SaleUnitModel.fromMap(data['saleUnitModel']);
-    newModel.stockModel = StockModel.fromMap(data['stockModel']);
-    newModel.subCatgModel = SubCatgModel.fromMap(data['subCatgModel']);
-    newModel.categoryModel = CategoryModel.fromMap(data['categoryModel']);
-    newModel.supplierModel = SupplierModel.fromMap(data['supplierModel']);
+    newModel.saleUnitModel = SaleUnitModel.fromMap({...data['saleUnitModel']});
+    newModel.stockModel = StockModel.fromMap({...data['stockModel']});
+    newModel.subCatgModel = SubCatgModel.fromMap({...data['subCatgModel']});
+    newModel.categoryModel = CategoryModel.fromMap({...data['categoryModel']});
+    newModel.supplierModel = SupplierModel.fromMap({...data['supplierModel']});
+    newModel.images = [...(data['images'] ?? [])];
     newModel.disPer = data['disPer'];
     newModel.salePercent = data['salePercent'];
     newModel.quantity = data['quantity'];
@@ -187,6 +189,7 @@ class SKUModel {
     this.inactive = false,
     this.openRate = false,
     this.discountable = false,
+    this.images,
   }) {
     createDate = DateTime.now();
     lastUpdate = DateTime.now();
@@ -215,4 +218,5 @@ class SKUModel {
   DateTime? productionDate;
   DateTime? expierDate;
   DateTime? inactiveAfter;
+  List<String>? images;
 }

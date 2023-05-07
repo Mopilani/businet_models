@@ -17,19 +17,19 @@ class CurrencyModel {
 
   CurrencyModel(
     this.id, {
-    required this.description,
+    required this.brief,
   });
 
   late int id;
   late dynamic mid; // Mongo document id
-  late String description;
+  late String brief;
 
   static const String collectionName = 'currencies';
 
   static CurrencyModel fromMap(Map<String, dynamic> data) {
     CurrencyModel model = CurrencyModel._();
     model.id = data['id'];
-    model.description = data['description'];
+    model.brief = data['brief'];
     model.mid = data['_id'];
 
     return model;
@@ -37,7 +37,7 @@ class CurrencyModel {
 
   Map<String, dynamic> toMap() => {
         'id': id,
-        'description': description,
+        'brief': brief,
       };
 
   String toJson() => json.encode(toMap());
@@ -103,10 +103,10 @@ class CurrencyModel {
     return CurrencyModel.fromMap(d);
   }
 
-  static Future<CurrencyModel?> findBydescription(String description) async {
+  static Future<CurrencyModel?> findByBrief(String brief) async {
     var d = await SystemMDBService.db
         .collection(collectionName)
-        .findOne(where.eq('description', description));
+        .findOne(where.eq('brief', brief));
     if (d == null) {
       return null;
     }

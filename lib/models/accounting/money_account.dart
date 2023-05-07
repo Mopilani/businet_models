@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../../utils/enums.dart';
 import '../../utils/system_db.dart';
 import 'transaction_model.dart';
 
@@ -77,6 +78,8 @@ class MoneyAccount {
   late AccountSubtype accountSubtype;
   late double money;
 
+  static const String collectionName = 'moneyaccounts'; 
+
   /// Note: this field is
   // late List<TransactionModel>
   //     trafficLog; // formated as ; '$value:out' | '$value:in' | reason
@@ -114,7 +117,7 @@ class MoneyAccount {
   static Future<List<MoneyAccount>> getAll() {
     List<MoneyAccount> models = [];
     return SystemMDBService.db
-        .collection('moneyaccounts')
+        .collection(collectionName)
         .find()
         .transform<MoneyAccount>(
           StreamTransformer.fromHandlers(
@@ -131,7 +134,7 @@ class MoneyAccount {
   }
 
   Stream<MoneyAccount>? stream() {
-    return SystemMDBService.db.collection('moneyaccounts').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(MoneyAccount.fromMap(data));
@@ -142,7 +145,7 @@ class MoneyAccount {
 
   Future<MoneyAccount?> aggregate(List<dynamic> pipeline) async {
     var d = await SystemMDBService.db
-        .collection('moneyaccounts')
+        .collection(collectionName)
         .aggregate(pipeline);
 
     return MoneyAccount.fromMap(d);
@@ -150,7 +153,7 @@ class MoneyAccount {
 
   Future<MoneyAccount?> get(int id) async {
     var d = await SystemMDBService.db
-        .collection('moneyaccounts')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -160,7 +163,7 @@ class MoneyAccount {
 
   static Future<MoneyAccount?> findById(int id) async {
     var d = await SystemMDBService.db
-        .collection('moneyaccounts')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -169,7 +172,7 @@ class MoneyAccount {
   }
 
   Future<MoneyAccount?> edit() async {
-    var r = await SystemMDBService.db.collection('moneyaccounts').update(
+    var r = await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -178,7 +181,7 @@ class MoneyAccount {
   }
 
   Future<int> delete() async {
-    var r = await SystemMDBService.db.collection('moneyaccounts').remove(
+    var r = await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
     print(r);
@@ -186,7 +189,7 @@ class MoneyAccount {
   }
 
   Future<int> add() async {
-    var r = await SystemMDBService.db.collection('moneyaccounts').insert(
+    var r = await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
     print(r);

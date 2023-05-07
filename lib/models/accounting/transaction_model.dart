@@ -3,32 +3,11 @@ import 'dart:convert';
 
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../../utils/enums.dart';
 import '../../utils/system_db.dart';
 import 'money_account.dart';
 
 
-enum TransactionType {
-  outcome,
-  income,
-}
-
-TransactionType transTypeFromString(String typeStr) {
-  switch (typeStr) {
-    case 'TransactionType.income':
-      return TransactionType.income;
-    case 'TransactionType.outcome':
-      return TransactionType.outcome;
-    default:
-      throw 'Main Axis Alignment, Error Happend مقصودة';
-  }
-}
-
-Map<dynamic, String> transactionsTranslations = {
-  TransactionType.income: 'دخل',
-  'TransactionType.income': 'دخل',
-  TransactionType.outcome: 'منصرف',
-  'TransactionType.outcome': 'منصرف',
-};
 
 class TransactionModel {
   TransactionModel(
@@ -40,6 +19,8 @@ class TransactionModel {
   });
 
   TransactionModel._();
+
+  static const String collectionName = 'transactions'; 
 
   late int id;
   late double value;
@@ -74,7 +55,7 @@ class TransactionModel {
   static Future<List<TransactionModel>> getAll() {
     List<TransactionModel> models = [];
     return SystemMDBService.db
-        .collection('transactions')
+        .collection(collectionName)
         .find()
         .transform<TransactionModel>(
           StreamTransformer.fromHandlers(
@@ -91,7 +72,7 @@ class TransactionModel {
   }
 
   static Stream<TransactionModel>? stream() {
-    return SystemMDBService.db.collection('transactions').find().transform(
+    return SystemMDBService.db.collection(collectionName).find().transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(TransactionModel.fromMap(data));
@@ -102,14 +83,14 @@ class TransactionModel {
 
   Future<TransactionModel?> aggregate(List<dynamic> pipeline) async {
     var d =
-        await SystemMDBService.db.collection('transactions').aggregate(pipeline);
+        await SystemMDBService.db.collection(collectionName).aggregate(pipeline);
 
     return TransactionModel.fromMap(d);
   }
 
   Future<TransactionModel?> get(int id) async {
     var d = await SystemMDBService.db
-        .collection('transactions')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -119,7 +100,7 @@ class TransactionModel {
 
   static Future<TransactionModel?> findById(int id) async {
     var d = await SystemMDBService.db
-        .collection('transactions')
+        .collection(collectionName)
         .findOne(where.eq('id', id));
     if (d == null) {
       return null;
@@ -128,7 +109,7 @@ class TransactionModel {
   }
 
   Future<TransactionModel?> edit() async {
-    await SystemMDBService.db.collection('transactions').update(
+    await SystemMDBService.db.collection(collectionName).update(
           where.eq('id', id),
           toMap(),
         );
@@ -137,7 +118,7 @@ class TransactionModel {
   }
 
   Future<int> delete() async {
-    await SystemMDBService.db.collection('transactions').remove(
+    await SystemMDBService.db.collection(collectionName).remove(
           where.eq('id', id),
         );
 
@@ -145,7 +126,7 @@ class TransactionModel {
   }
 
   Future<int> add() async {
-    await SystemMDBService.db.collection('transactions').insert(
+    await SystemMDBService.db.collection(collectionName).insert(
           toMap(),
         );
 

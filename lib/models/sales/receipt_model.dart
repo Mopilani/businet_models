@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:mongo_dart/mongo_dart.dart';
 
+import '../../utils/enums.dart';
 import '../../utils/system_db.dart';
 import '../costumer_model.dart';
 import '../hr/user_model.dart';
@@ -81,24 +82,24 @@ class ReceiptModel {
       shiftNumber: data['shiftNumber'],
       costumer: data['costumer'] == null
           ? null
-          : CostumerModel.fromMap(data['costumer']),
-      userModel: UserModel.fromMap(data['userModel']),
-      stockModel: StockModel.fromMap(data['stockModel']),
+          : CostumerModel.fromMap({...data['costumer']}),
+      userModel: UserModel.fromMap({...data['userModel']}),
+      stockModel: StockModel.fromMap({...data['stockModel']}),
       deliveryModel: data['deliveryModel'] == null
           ? null
-          : DeliveryModel.fromMap(data['deliveryModel']),
-      systemNodeModel: SystemNodeModel.fromMap(data['systemNodeModel']),
+          : DeliveryModel.fromMap({...data['deliveryModel']}),
+      systemNodeModel: SystemNodeModel.fromMap({...data['systemNodeModel']}),
       // paymentMethodModel:
       //     PaymentMethodModel.fromMap(data['paymentMethodModel']),
       receiptPaymentMethods: (data['receiptPaymentMethods'])
           .map<ReceiptPaymentMethodEntryModel>(
-            (element) => ReceiptPaymentMethodEntryModel.fromMap(element),
+            (element) => ReceiptPaymentMethodEntryModel.fromMap({...element}),
           )
           .toList(),
       receiptEntries: (data['receiptEntries']).map<String, ReceiptEntryModel>(
         (key, value) => MapEntry<String, ReceiptEntryModel>(
           key,
-          ReceiptEntryModel.fromMap(value),
+          ReceiptEntryModel.fromMap({...value}),
         ),
       ),
       receiptState: getReceiptState(data['receiptState'])!,
@@ -466,32 +467,3 @@ class ReceiptModel {
   }
 }
 
-enum ReceiptState {
-  payed,
-  onWait,
-  returned,
-  canceled,
-  partialPay,
-}
-
-Map<dynamic, String> receiptStatesTranslations = {
-  ReceiptState.canceled: 'ملغية',
-  ReceiptState.onWait: 'في الانتظار',
-  ReceiptState.partialPay: 'مدفوعة جزئيا',
-  ReceiptState.payed: 'مدفوعة',
-  ReceiptState.returned: 'راجعة',
-  'BillState.canceled': 'ملغية',
-  'BillState.onWait': 'في الانتظار',
-  'BillState.partialPay': 'مدفوعة جزئيا',
-  'BillState.payed': 'مدفوعة',
-  'BillState.returned': 'راجعة',
-};
-
-ReceiptState? getReceiptState(String state) {
-  for (var billState in ReceiptState.values) {
-    if (billState.toString() == state) {
-      return billState;
-    }
-  }
-  return null;
-}

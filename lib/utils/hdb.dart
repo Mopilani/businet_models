@@ -51,7 +51,7 @@ class HDbCollection extends DbCollection {
       {bool upsert = false,
       bool multiUpdate = false,
       WriteConcern? writeConcern}) async {
-    var id = document['id'];
+    var id = document['_hid'];
     await box.put(id, document);
     return document;
   }
@@ -65,29 +65,31 @@ class HDbCollection extends DbCollection {
       MapEntry entry;
       List<Map<dynamic, dynamic>> items;
       if (kSelector!.paramLimit > 0) {
-        int limit = kSelector!.paramLimit;
+        int limit = kSelector.paramLimit;
         var count = 0;
         items = box.values.toList();
-        print('items: $items');
-        for (var index = kSelector!.paramSkip; index < items.length; index++) {
+        // print('items: $items');
+        for (var index = kSelector.paramSkip; index < items.length; index++) {
           var value = items[index];
           count++;
           if (count >= limit) break;
-          print(value);
+          // print(value);
           yield {...value};
         }
       } else {
         items = <Map<dynamic, dynamic>>[];
       }
 
-      for (var element in kSelector!.map.entries) {
+      for (var element in kSelector.map.entries) {
         if (element.value is String) {
           if (!element.key.contains('comment') ||
               !element.key.contains('hint')) {
             entry = element;
-            for (Map<dynamic, dynamic> value in [...items]) {
+
+            for (var i = 0; i < items.length; i++) {
+              Map<dynamic, dynamic> value = items[i];
               if (value[entry.key] == entry.value) {
-                yield {...value};
+                yield {...value, '_hid': i};
               }
             }
             break;
@@ -95,8 +97,10 @@ class HDbCollection extends DbCollection {
         }
       }
     } else {
-      for (Map<dynamic, dynamic> value in [...box.values]) {
-        yield {...value};
+      var valuesList = box.values.toList();
+      for (var i = 0; i < valuesList.length; i++) {
+        Map<dynamic, dynamic> value = valuesList[i];
+        yield {...value, '_hid': i};
       }
     }
     // return Stream.fromIterable(<Map<String, dynamic>>[...box.values]);
@@ -145,9 +149,11 @@ class HDbCollection extends DbCollection {
 
         // if ((element.value as Map).keys.contains('id')) {
         map = element.value;
-        print('The map is: $map');
-        print('box.values: ${box.values}');
-        for (var value in box.values) {
+        // print('The map is: $map');
+        // print('box.values: ${box.values}');
+        var valuesList = box.values.toList();
+        for (var i = 0; i < valuesList.length; i++) {
+          var value = valuesList[i];
           var desiredSimilarityCount = map.entries.length;
           var foundSimilarityCount = 0;
           for (MapEntry entry in map.entries) {
@@ -156,7 +162,7 @@ class HDbCollection extends DbCollection {
             }
           }
           if (foundSimilarityCount == desiredSimilarityCount) {
-            return {...value};
+            return {...value, '_hid': i};
           }
         }
         break;
@@ -187,7 +193,30 @@ class HDbCollection extends DbCollection {
   @override
   Future<Map<String, dynamic>> remove(selector,
       {WriteConcern? writeConcern}) async {
-    throw UnimplementedError();
+    var kSelector = selector as SelectorBuilder;
+    Map map;
+    print('kSelector.map: ${kSelector.map}');
+    for (var element in kSelector.map.entries) {
+      if (element.key == '\$query') {
+        map = element.value;
+        var valuesList = box.values.toList();
+        for (var i = 0; i < valuesList.length; i++) {
+          var value = valuesList[i];
+          var desiredSimilarityCount = map.entries.length;
+          var foundSimilarityCount = 0;
+          for (MapEntry entry in map.entries) {
+            if (value[entry.key] == entry.value) {
+              foundSimilarityCount++;
+            }
+          }
+          if (foundSimilarityCount == desiredSimilarityCount) {
+            box.delete(box.keyAt(i));
+          }
+        }
+        break;
+      }
+    }
+    return {'msg': 'Not Found'};
   }
 
   @override

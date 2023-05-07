@@ -117,9 +117,9 @@ class SystemNodeModel {
     model.printerName = data['printerName'];
     model.groupId = data['groupId'];
     model.deviceId = data['deviceId'];
-    model.watchedTuts = data['watchedTuts'];
+    model.watchedTuts = [...data['watchedTuts']];
     model.stock =
-        data['stock'] == null ? null : StockModel.fromMap(data['stock']);
+        data['stock'] == null ? null : StockModel.fromMap({...data['stock']});
     model.firstManagerName = data['firstManagerName'];
     model.firstManagerPhone = data['firstManagerPhone'];
     model.firstManagerRank = data['firstManagerRank'];
@@ -186,7 +186,7 @@ class SystemNodeModel {
   }
 
   static SystemNodeModel? get stored => SystemCache.get('node');
-  void _setNode(SystemNodeModel pos) => SystemCache.set('node', pos);
+  // void _setNode(SystemNodeModel pos) => SystemCache.set('node', pos);
   static void setNode(SystemNodeModel? pos) => SystemCache.set('node', pos);
 
   static const String collectionName = 'systemFile';
